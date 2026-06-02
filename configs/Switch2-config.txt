@@ -1,0 +1,33 @@
+enable
+configure terminal
+
+hostname Switch2
+no ip domain-lookup
+service password-encryption
+enable secret class
+
+banner motd #Authorised access only.#
+
+interface vlan 1
+ description Management VLAN
+ ip address 192.168.1.2 255.255.0.0
+ no shutdown
+exit
+
+ip default-gateway 192.168.1.1
+
+line console 0
+ password cisco
+ login
+ logging synchronous
+exit
+
+line vty 0 4
+ password cisco
+ login
+ transport input telnet
+ exec-timeout 10 0
+exit
+
+end
+copy running-config startup-config

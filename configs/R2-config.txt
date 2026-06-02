@@ -1,0 +1,57 @@
+enable
+configure terminal
+
+hostname R2
+no ip domain-lookup
+service password-encryption
+enable secret class
+
+banner motd #Authorised access only.#
+
+ip domain-name lab.local
+username admin privilege 15 secret Admin@123
+
+crypto key generate rsa modulus 1024
+ip ssh version 2
+
+interface GigabitEthernet0/0
+ description LAN to Switch2
+ ip address 192.168.1.1 255.255.0.0
+ no shutdown
+exit
+
+interface Serial0/0/0
+ description WAN link to R1
+ ip address 20.20.20.2 255.255.255.252
+ no shutdown
+exit
+
+ip dhcp excluded-address 192.168.0.1 192.168.1.2
+
+ip dhcp pool RIGHT_LAN
+ network 192.168.0.0 255.255.0.0
+ default-router 192.168.1.1
+ dns-server 8.8.8.8
+ domain-name lab.local
+exit
+
+router ospf 1
+ router-id 2.2.2.2
+ network 192.168.0.0 0.0.255.255 area 0
+ network 20.20.20.0 0.0.0.3 area 0
+exit
+
+line console 0
+ password cisco
+ login
+ logging synchronous
+exit
+
+line vty 0 4
+ login local
+ transport input ssh
+ exec-timeout 10 0
+exit
+
+end
+copy running-config startup-config
